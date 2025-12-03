@@ -85,49 +85,39 @@ def load_data(input_data_path: Union[str, Path]) -> pd.DataFrame:
 # -------------------------------------------------------------------
 #  Function: Split Dataset
 # -------------------------------------------------------------------
-def splits_data(df: pd.DataFrame) -> pd.DataFrame:
+def splits_data(df: pd.DataFrame):
     """
-    split data steps.
-
-    Args:
-        df (pd.DataFrame): The clean dataset.
-
-    Returns:
-        pd.DataFrame: splits Cleaned dataset (train, test)
+    Split dataset into train and test sets.
     """
-    logger.info("splits dataset...")
+    logger.info("Splitting dataset into train and test...")
 
-    # 👉 YOUR CODE HERE:
-    # - Use train_test_split(df, ...)
-    # - Return df_train, df_test
+    df_train, df_test = train_test_split(
+        df, test_size=0.2, random_state=42, shuffle=True
+    )
+
+    logger.info(f"Train shape: {df_train.shape} | Test shape: {df_test.shape}")
+
+    return df_train, df_test
+
 
 
 # -------------------------------------------------------------------
 #  Function: Save Output Files
 # -------------------------------------------------------------------
-def save_data(df_train: pd.DataFrame, df_test: pd.DataFrame) -> Path:
+def save_data(df_train: pd.DataFrame, df_test: pd.DataFrame):
     """
-    Saves the splits cleaned DataFrame as a CSV to the standardized data directory.
-
-    Args:
-        df_train (pd.DataFrame): train Cleaned dataset to save.
-        df_test (pd.DataFrame): test Cleaned dataset to save.
-    
-    Returns:
-        None
+    Save train and test CSV files into datastores/splits_data
     """
-
-    logger.info("Saving multiple artifacts file")
-
     file_paths = {
         "train_data.csv": df_train,
         "test_data.csv": df_test,
     }
-    for filename, df in file_paths.items():
-        ## YOUR CODE HERE
-        # Save train_data.csv and test_data.csv in OUTPUT_DIR
 
-        logger.info(f"Save split data : {filename}: into datastores.")
+    for filename, df in file_paths.items():
+        output_path = OUTPUT_DIR / filename
+        df.to_csv(output_path, index=False)
+        logger.info(f"Saved split file: {output_path}")
+
 
 
 # -------------------------------------------------------------------
@@ -159,16 +149,17 @@ def parse_arguments() -> argparse.Namespace:
 #  Main Entry Point
 # -------------------------------------------------------------------
 def main() -> None:
-    """
-    Main function for CLI execution.
-    Loads, cleans, and saves data in one reproducible pipeline step.
-    """
     args = parse_arguments()
 
-    # 👉 YOUR CODE HERE:
-    # - Call df_clean=load_data(...) with args.input_data_path
-    # - Call df_train, df_test=split_data(...) on the clean data `df_clean`
-    # - Call save_data(...) on the split data `df_train`, `df_test`
+    # Load cleaned dataset
+    df_clean = load_data(args.input_data_path)
+
+    # Split into train and test
+    df_train, df_test = splits_data(df_clean)
+
+    # Save split datasets
+    save_data(df_train, df_test)
+
 
 
 

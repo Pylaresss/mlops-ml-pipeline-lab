@@ -81,40 +81,36 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     """
     Cleans the provided dataset by stripping column names,
     removing duplicates, and dropping missing values.
-
-    Args:
-        df (pd.DataFrame): The raw dataset.
-
-    Returns:
-        pd.DataFrame: Cleaned dataset.
     """
     logger.info("Cleaning dataset...")
-    # 👉 YOUR CODE HERE:
-    # - Strip column names (use df.columns.str.strip())
-    # - Remove duplicates (use df.drop_duplicates())
-    # - Drop missing values (use df.dropna())
-    # - Log final shape
-    # - Return the cleaned DataFrame
-    
+
+    # Strip whitespace from column names
+    df.columns = df.columns.str.strip()
+
+    # Remove duplicate rows
+    df = df.drop_duplicates()
+
+    # Drop rows with missing values
+    df = df.dropna()
+
+    logger.info(f"Dataset cleaned. New shape: {df.shape}")
+
+    return df
+
 
 
 def save_data(df: pd.DataFrame, output_data_filename: str) -> Path:
     """
     Saves the cleaned DataFrame as a CSV to the standardized data directory.
-
-    Args:
-        df (pd.DataFrame): Cleaned dataset to save.
-        output_data_filename (str): Name of the output CSV file.
-
-    Returns:
-        Path: The path where the cleaned file was saved.
     """
-    # 👉 YOUR CODE HERE:
-    # - Define output_path = OUTPUT_DIR / output_data_filename
-    # - Save DataFrame to CSV (index=False)
-    # - Add logging.info message for confirmation
-    # - Return the output_path
-    
+    output_path = OUTPUT_DIR / output_data_filename
+
+    df.to_csv(output_path, index=False)
+
+    logger.info(f"Clean data saved to: {output_path}")
+
+    return output_path
+ 
 
 
 # -------------------------------------------------------------------
@@ -159,11 +155,15 @@ def main() -> None:
     """
     args = parse_arguments()
 
-    # 👉 YOUR CODE HERE:
-    # - Call load_data() with args.input_data_path
-    # - Call clean_data() on the loaded DataFrame
-    # - Call save_data() with cleaned DataFrame and args.output_data_filename
-    
+    # Load raw data
+    df_raw = load_data(args.input_data_path)
+
+    # Clean the data
+    df_clean = clean_data(df_raw)
+
+    # Save cleaned data
+    save_data(df_clean, args.output_data_filename)
+ 
 
 
 if __name__ == "__main__":
